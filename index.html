@@ -8,6 +8,8 @@
 <script src="treemap.js"></script>
 <style>
 html, body {
+    overflow: hidden;
+    line-height: 0.5;
     background-color: white;
     position: relative;
     margin: 0;
@@ -25,15 +27,24 @@ html, body {
     z-index: 1;
 }
 #title_layer {
-    position: absolute;
     z-index: 0;
 }
 rect:hover {
     fill-opacity: 1.0;
 }
+.tooltip {
+    display: none;
+    background-color: white;
+    border: 1px solid black;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+    margin: 20px;
+}
 </style>
 </head>
 <body>
+<div class="tooltip">hello there</div>
 <div id="title_layer"></div>
 <div id="salary_treemap"></div>
 <script>

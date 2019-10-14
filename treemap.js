@@ -1,3 +1,16 @@
+function format_salary(val) {
+    var label = " mil";
+    var tmp = val / Math.pow(10, 6);
+    if (tmp < 1.0) {
+        label = "";
+        val = val.toLocaleString();
+    }
+    else {
+        val = tmp.toFixed(2);
+    }
+    return "$" + val + label;
+}
+
 function create_treemap(container_id, title_id, data) {
 
     // set the dimensions and margins of the graph
@@ -39,6 +52,39 @@ function create_treemap(container_id, title_id, data) {
         return colors[name].colors[colors[name].secondaryColor].hex;
     }
 
+    var Tooltip = d3.select(".tooltip");
+
+    // from https://www.d3-graph-gallery.com/graph/interactivity_tooltip.html
+    // Three function that change the tooltip when user hover / move / leave a cell
+    var mouseover = function(d) {
+        Tooltip.style("display", "initial");
+    };
+    var mousemove = function(d) {
+        console.log(d.data);
+        Tooltip.html("<p>Rank: " + d.data.rk + "</p><p>"+d.data.player+"</p><p>"+format_salary(d.data["2019_20"])+"</p>");
+            
+        if (d.x0 < width/2) {
+            Tooltip.style("left", (d.x0 + d3.mouse(this)[0]+15) + "px")
+                .style("right", "initial");
+        }
+        else {
+            Tooltip.style("left", "initial")
+                .style("right", width - (d.x0 + d3.mouse(this)[0]-15) + "px");
+        }
+        if (d.y0 < height/2) {
+            Tooltip.style("top", (d.y0 + d3.mouse(this)[1]) + "px")
+                .style("bottom", "initial");
+        }
+        else {
+            Tooltip.style("bottom", height - (d.y0 + d3.mouse(this)[1]) + "px")
+                .style("top", "initial");
+        }
+
+    };
+    var mouseleave = function(d) {
+        Tooltip.style("display", "none");
+    };
+
     var root = get_treemap(data);
     var leaf = svg.selectAll("g")
         .data(root.leaves())
@@ -70,7 +116,8 @@ function create_treemap(container_id, title_id, data) {
         .attr("fill", d => get_color(d.data.tm))
         .attr("fill-opacity", 0.6)
         .attr("width", d => d.x1 - d.x0)
-        .attr("height", d => d.y1 - d.y0);
-    
-
+        .attr("height", d => d.y1 - d.y0)
+        .on("mouseover", mouseover)
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave);
 }
