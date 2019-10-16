@@ -11,7 +11,7 @@ function format_salary(val) {
     return "$" + val + label;
 }
 
-function create_treemap(container_id, title_id, data) {
+function create_treemap(container_id, title_id, data, year) {
 
     // set the dimensions and margins of the graph
     var margin = {top: 0, right: 0, bottom: 0, left: 0};
@@ -33,14 +33,14 @@ function create_treemap(container_id, title_id, data) {
         .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var get_treemap = function(data) {
+    var get_treemap = function(year) {
         const treemap = d3.treemap()
             .size([width, height])
             .padding(1);
         return treemap(
             d3.hierarchy(data)
-                .sum(d => d["2019_20"])
-                .sort((a, b) => b["2019_20"] - a["2019_20"])
+                .sum(d => d[year])
+                .sort((a, b) => b[year] - a[year])
         );
     };
 
@@ -59,54 +59,43 @@ function create_treemap(container_id, title_id, data) {
     var mouseover = function(d) {
         Tooltip.style("display", "initial");
     };
-    var mousemove = function(d) {
-        console.log(d.data);
-        Tooltip.html("<p>Rank: " + d.data.rk + "</p><p>"+d.data.player+"</p><p>"+format_salary(d.data["2019_20"])+"</p>");
+    var mousemove = function(d, theyear, ele) {
+        Tooltip.html("<p>"+d.data.player+"</p><p>"+format_salary(d.data[theyear])+"</p>");
             
         if (d.x0 < width/2) {
-            Tooltip.style("left", (d.x0 + d3.mouse(this)[0]+15) + "px")
+            Tooltip.style("left", (d.x0 + d3.mouse(ele)[0]+15) + "px")
                 .style("right", "initial");
         }
         else {
             Tooltip.style("left", "initial")
-                .style("right", width - (d.x0 + d3.mouse(this)[0]-15) + "px");
+                .style("right", width - (d.x0 + d3.mouse(ele)[0]-15) + "px");
         }
         if (d.y0 < height/2) {
-            Tooltip.style("top", (d.y0 + d3.mouse(this)[1]) + "px")
+            Tooltip.style("top", (d.y0 + d3.mouse(ele)[1]) + "px")
                 .style("bottom", "initial");
         }
         else {
-            Tooltip.style("bottom", height - (d.y0 + d3.mouse(this)[1]) + "px")
+            Tooltip.style("bottom", height - (d.y0 + d3.mouse(ele)[1]) + "px")
                 .style("top", "initial");
         }
-
     };
     var mouseleave = function(d) {
         Tooltip.style("display", "none");
     };
 
-    var root = get_treemap(data);
+    var root = get_treemap(year);
     var leaf = svg.selectAll("g")
         .data(root.leaves())
         .join("g")
             .attr("transform", d => `translate(${d.x0},${d.y0})`);
-
-    
-    /*leaf.append("text")
-        .attr("x", 5)
-        .attr("y", 20)
-        .text(d => d.data.player)
-        .attr("fill", "white");//d => get_text_color(d.data.tm));*/
-
-    console.log(root.descendants().filter(function(d){return d.depth==1}));
 
     title_layer.selectAll("titles")
         .data(root.descendants().filter(function(d){return d.depth==1}))
         .enter()
         .append("text")
             .attr("class", "team-title")
-            .attr("x", d => d.x0)// + (d.x1 - d.x0)/2.0)
-            .attr("y", d => d.y1-3)// - (d.y1 - d.y0)/2.0)
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y1-3)
             .text(function(d){ return d.data.name })
             .attr("font-size", d => d3.min([d.y1-d.y0, (d.x1-d.x0)/3]) + "px")
             .attr("fill", d => get_color(d.data.name))
@@ -118,6 +107,51 @@ function create_treemap(container_id, title_id, data) {
         .attr("width", d => d.x1 - d.x0)
         .attr("height", d => d.y1 - d.y0)
         .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
+        .on("mousemove", function(d) { mousemove(d, year, this); })
         .on("mouseleave", mouseleave);
+
+    var chart = {
+        data_update: function(newyear) {
+            var root = get_treemap(newyear);
+
+            console.log(newyear);
+
+            var dur = 2000;
+
+            // must do this selection before transition
+            var leaf = svg.selectAll("g");
+
+            leaf.select("rect")
+                .on("mouseover", mouseover)
+                .on("mousemove", function(d) { mousemove(d, newyear, this); })
+                .on("mouseleave", mouseleave);
+
+            // update the groups that contain rects
+            leaf.data(root.leaves())
+                .join("g")
+                .transition()
+                .duration(dur)
+                .attr("transform", d => `translate(${d.x0},${d.y0})`);
+            
+            // update the rects 
+            leaf.select("rect")
+                .transition()
+                .duration(dur)
+                .attr("fill", d => get_color(d.data.tm))
+                .attr("width", d => d.x1 - d.x0)
+                .attr("height", d => d.y1 - d.y0);
+
+            // transition team labels
+            title_layer.selectAll("text")
+                .data(root.descendants().filter(function(d){return d.depth==1}))
+                .transition()
+                .duration(dur)
+                    .attr("x", d => d.x0)
+                    .attr("y", d => d.y1-3)
+                    .text(function(d){ return d.data.name })
+                    .attr("font-size", d => d3.min([d.y1-d.y0, (d.x1-d.x0)/3]) + "px")
+                    .attr("fill", d => get_color(d.data.name));
+        }
+    }
+    return chart;
 }

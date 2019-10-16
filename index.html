@@ -8,14 +8,12 @@
 <script src="treemap.js"></script>
 <style>
 html, body {
-    overflow: hidden;
+    overflow: auto;
     line-height: 0.5;
     background-color: white;
     position: relative;
     margin: 0;
     padding: 0;
-    height: 100%;
-    width: 100%;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 #salary_treemap, #title_layer {
@@ -41,15 +39,58 @@ rect:hover {
     z-index: 2;
     margin: 20px;
 }
+.chart-container {
+    height: 450px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.body-container {
+    max-width: 800px;
+    margin: auto;
+    position: relative;
+}
+.control:hover {
+    cursor: pointer;
+}
+#year {
+    color: grey;
+}
+h1 {
+    padding-bottom: 0px;
+    margin-bottom: 6px;
+}
 </style>
 </head>
 <body>
-<div class="tooltip">hello there</div>
-<div id="title_layer"></div>
-<div id="salary_treemap"></div>
+<div class="body-container">
+    <span style="padding-left: 1px;" class="control" onclick="prev_year();">prev</span>
+    <h1 style="text-align: center; display: inline-block;"><b id="year">2019-20</b> NBA Contracts</h1>
+    <span class="control" onclick="next_year();">next</span>
+    <div class="chart-container">
+        <div class="tooltip">hello there</div>
+        <div id="title_layer"></div>
+        <div id="salary_treemap"></div>
+    </div>
+    <div class="chart-controls"></div>
+</div>
 <script>
-
-var chart = create_treemap("#salary_treemap", "#title_layer", GLOBAL_DATA);
+var ind = 0;
+var years = ["2019_20","2020_21","2021_22","2022_23","2023_24","2024_25"];
+var chart = create_treemap("#salary_treemap", "#title_layer", GLOBAL_DATA, years[0]);
+function next_year() {
+    ind = (ind + 1) % years.length;
+    chart.data_update(years[ind]);
+    document.getElementById("year").innerText = years[ind].replace("_", "-");
+}
+function prev_year() {
+    ind -= 1;
+    if (ind < 0) {
+        ind = years.length-1;
+    }
+    chart.data_update(years[ind]);
+    document.getElementById("year").innerText = years[ind].replace("_", "-");
+}
 </script>
 </body>
 </html>
