@@ -47,6 +47,7 @@ rect:hover {
 }
 .body-container {
     max-width: 800px;
+    min-width: 500px;
     margin: auto;
     position: relative;
 }
@@ -60,6 +61,22 @@ h1 {
     padding-bottom: 0px;
     margin-bottom: 6px;
 }
+
+@media only screen and (max-width: 600px) {
+    .body-container {
+        width: 200%;
+    }
+    .chart-container {
+        height: 1000px;
+    }
+    .control {
+        margin-right: 10px;
+        margin-left: 10px;
+        height: 25px;
+        color: blue;
+        font-size: 25pt;
+    }
+}
 </style>
 </head>
 <body>
@@ -72,7 +89,8 @@ h1 {
         <div id="title_layer"></div>
         <div id="salary_treemap"></div>
     </div>
-    <div class="chart-controls"></div>
+    <div style="text-align: center;">
+        <p><a href="https://twitter.com/seawhaleplusn">@seawhaleplusn</a> - <a href="https://github.com/kublasean/nba_salary_map">source</a> - <a href="https://highheatrocks.com">my band</p>
 </div>
 <script>
 var ind = 0;
