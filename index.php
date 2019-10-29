@@ -6,15 +6,18 @@
 <script src="resource/colors.js"></script>
 <script src="data/2019_2020_contracts.js"></script>
 <script src="treemap.js"></script>
+<link rel="stylesheet" href="/resource/w3.css">
+<link rel="stylesheet" href="/resource/seansite.css">
+
 <style>
+nav {
+    z-index: 3;
+}
 html, body {
     overflow: auto;
-    line-height: 0.5;
-    background-color: white;
     position: relative;
     margin: 0;
     padding: 0;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 #salary_treemap, #title_layer {
     width: 100%;
@@ -46,9 +49,7 @@ rect:hover {
     overflow: hidden;
 }
 .body-container {
-    max-width: 800px;
-    min-width: 500px;
-    margin: auto;
+    line-height: 0.5;
     position: relative;
 }
 .control:hover {
@@ -79,19 +80,18 @@ h1 {
 }
 </style>
 </head>
-<body>
-<div class="body-container">
-    <span style="padding-left: 1px;" class="control" onclick="prev_year();">prev</span>
-    <h1 style="text-align: center; display: inline-block;"><b id="year">2019-20</b> NBA Contracts</h1>
-    <span class="control" onclick="next_year();">next</span>
-    <div class="chart-container">
-        <div class="tooltip">hello there</div>
-        <div id="title_layer"></div>
-        <div id="salary_treemap"></div>
+<body class="base-color">
+    <?php $_GET['section'] = "nba"; include('../../../cgi-bin/navbar.php'); ?>
+    <div class="body-container foreground-color">
+        <span style="padding-left: 1px;" class="control" onclick="prev_year();">prev</span>
+        <h1 style="text-align: center; display: inline-block;"><b id="year">2019-20</b> NBA Contracts</h1>
+        <span class="control" onclick="next_year();">next</span>
+        <div class="chart-container">
+            <div class="tooltip">hello there</div>
+            <div id="title_layer"></div>
+            <div id="salary_treemap"></div>
+        </div>
     </div>
-    <div style="text-align: center;">
-        <p><a href="https://twitter.com/seawhaleplusn">@seawhaleplusn</a> - <a href="https://github.com/kublasean/nba_salary_map">source</a> - <a href="https://highheatrocks.com">my band</p>
-</div>
 <script>
 var ind = 0;
 var years = ["2019_20","2020_21","2021_22","2022_23","2023_24","2024_25"];
