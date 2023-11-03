@@ -1,6 +1,8 @@
 # nba_salary_map
 Experimenting with d3.js to visualize the player / salary distributions per team
 
+Demo link: https://kublasean.github.io/projects/2019/11/04/nba-salary-map.html
+
 ### references:
 - https://www.d3-graph-gallery.com/graph/treemap_custom.html
 - https://observablehq.com/@d3/treemap
